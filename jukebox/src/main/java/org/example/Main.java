@@ -24,8 +24,6 @@ public class Main {
         }
 
 
-
-
         if(checkFileType(songName) == 1){
             playSong(songName,checkMode(mode));
 
@@ -70,19 +68,35 @@ public class Main {
     }
 
     public static ArrayList<String> m3uSongs(String songName) throws IOException {
+
         File m3uFile = new File(songName);
+
+        if(!(m3uFile.isAbsolute())){
+            songName = "..\\.\\" + songName;
+            m3uFile = new File(songName);
+        }
         Reader reader = new FileReader(m3uFile);
         BufferedReader bufferedReader = new BufferedReader(reader);
         String line = bufferedReader.readLine();
         ArrayList<String> playlist = new ArrayList<>() ;
 
+
         while (line!=null){
 
             if (!(line.startsWith("#") || line.isBlank())){
 
-                int i = line.indexOf('-');
-                playlist.add(line.substring(0,i-1)+"\\"+line.substring(i+2));
+                File songFile= new File(line);
+                if(!(songFile.isAbsolute())){
+                    line = "..\\.\\" + line;
+                    playlist.add(line);
+
+                }else {
+                    int i = line.indexOf('-');
+                    playlist.add(line.substring(0, i - 1) + "\\" + line.substring(i + 2));
+
+                }
             }
+
             line = bufferedReader.readLine();
 
         }
@@ -93,7 +107,6 @@ public class Main {
 
 
     public static void playSong(String songName, int mode){
-
 
         switch (mode){
             case 1:
@@ -110,6 +123,12 @@ public class Main {
 
     private static void callPlayer(String songName) {
         File songFile = new File(songName);
+
+        if((!songFile.isAbsolute())){
+            songName = "..\\.\\"+ songName;
+            songFile = new File(songName);
+        }
+
         try {
             InputStream song = new FileInputStream(songFile);
             p.play(song);
@@ -121,7 +140,7 @@ public class Main {
     }
 
     private static void playPlaylist(ArrayList<String> mp3){
-        for(int i=0;i < mp3.size() ;i++) {
+        for(int i=0;i < mp3.size();i++) {
             File songFile = new File(mp3.get(i));
 
             try {
